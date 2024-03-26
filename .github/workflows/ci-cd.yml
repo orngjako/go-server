@@ -18,9 +18,9 @@ jobs:
     - name: Login to Azure Container Registry
       uses: docker/login-action@v2
       with:
-        registry: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        registry: goserver.azurecr.io  # Your ACR address as a literal value
+        username: ${{ secrets.REGISTRY_USERNAME }}  # Assuming this is stored as a secret
+        password: ${{ secrets.REGISTRY_PASSWORD }}  # Assuming this is stored as a secret
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v3
@@ -28,7 +28,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ secrets.IMAGE_NAME }}:latest
+        tags: goserver.azurecr.io/go-hello-world:latest  # Your Docker image as a literal value
 
     - name: Login to Azure
       uses: azure/login@v2
@@ -38,8 +38,8 @@ jobs:
     - name: Set Web App Container
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ secrets.APP_NAME }}
-        images: '${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ secrets.IMAGE_NAME }}:latest'
+        app-name: ${{ secrets.APP_NAME }}  # Assuming this is stored as a secret
+        images: 'goserver.azurecr.io/go-hello-world:latest'  # Your Docker image as a literal value again for deployment
 
     - name: Logout of Azure
       run: az logout
