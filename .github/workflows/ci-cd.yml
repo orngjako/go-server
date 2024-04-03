@@ -3,7 +3,7 @@ name: Build and deploy to Azure App Service
 on:
   push:
     branches:
-      - main  # Set to your default branch ..
+      - main  #Default branch ..
 
 jobs:
   build-and-deploy:
@@ -11,16 +11,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      #Checks out code repository for use in the workflow.
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
+      #Sets up Docker Buildx, which is a tool for building Docker images.
 
     - name: Login to Azure Container Registry
       uses: docker/login-action@v2
       with:
-        registry: goserver.azurecr.io  # Your ACR address as a literal value
-        username: ${{ secrets.REGISTRY_USERNAME }}  # Assuming this is stored as a secret
-        password: ${{ secrets.REGISTRY_PASSWORD }}  # Assuming this is stored as a secret
+        registry: goserver.azurecr.io  #ACR address as a literal value (Still need to fix)
+        username: ${{ secrets.REGISTRY_USERNAME }}  #Stored secret
+        password: ${{ secrets.REGISTRY_PASSWORD }}  #Stored secret
+      #Logs in to Azure Container Registry (ACR) to push Docker image.
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v3
@@ -29,17 +32,22 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: goserver.azurecr.io/go-hello-world:latest  # Your Docker image as a literal value
+      #Builds Docker image using the Dockerfile,
+      # and then pushes the image to Azure Container Registry.
 
     - name: Login to Azure
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #Logs in to your Azure account using the provided credentials.
 
     - name: Set Web App Container
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ secrets.APP_NAME }}  # Assuming this is stored as a secret
-        images: 'goserver.azurecr.io/go-hello-world:latest'  # Your Docker image as a literal value again for deployment
+        app-name: ${{ secrets.APP_NAME }}  #Stored secret
+        images: 'goserver.azurecr.io/go-hello-world:latest'  # Docker image as a literal value again for deployment
+      #Deploys Docker image to Azure App Service.
 
     - name: Logout of Azure
       run: az logout
+      #Logs out of Azure account to end the session.
